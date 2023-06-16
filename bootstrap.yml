@@ -1,0 +1,57 @@
+---
+
+- hosts: bootstrap
+
+  vars:
+    admin_user_public_ssh_key: "\
+      ssh-rsa \
+      AAAAB3NzaC1yc2EAAAADAQABAAABAQDlC9ZiZ54SkSZy8ENUmd4JW0vR+W5IHxv69wBJMxEau\
+      /o0Oco9TjtVT//BcwECu+VL5YcyemOyUFV9QPVU99A6rF6l7Z4tYGr/X41qbbo5xt8MOju3gn\
+      ZZhpfrqOshDNnKK/POx529VkOwwq8ikZp3aEnKcl50lO+RYLdBX/JDGQ88tWhbKFe4O7RWohM\
+      ywjcLAEnUNG1FMQyjgCy5wuChqV0fGgy9rasdOvd0pPo7rjZZ7kg8Jqs3cf5n9XG5LLrcLiVr\
+      7fX1VJlbK5oxHFRChvH6WFQCnZrXnhkkkOWBfRZTGfZPJbh0M+SSBSZu4lFyO8vwOaITE+GiE\
+      D3nwg3J \
+      david@workstation"
+
+  tasks:
+
+    - name: Create the admin user
+      ansible.builtin.user:
+        name: "{{ admin_user }}"
+        shell: /usr/bin/bash
+        groups: [sudo]
+        append: yes
+
+    - name: Create .ssh directory for the admin user
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.ssh"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: u=rwx,g=,o=
+
+    - name: Add the admin user's public key its authorized keys
+      ansible.builtin.lineinfile:
+        path: "/home/{{ admin_user }}/.ssh/authorized_keys"
+        create: true # create authorized_keys file if it doesn't already exist
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: u=rw,g=,o=
+        line: "{{ admin_user_public_ssh_key }}"
+
+    - name: Allow the admin user to sudo without password
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        regexp: '^(%sudo\s+ALL=\(ALL:ALL\)\s+)(?:NOPASSWD)?ALL$'
+        line: '\1NOPASSWD:ALL'
+        backrefs: yes
+
+    - name: Set the operating system hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+    
+    - name: Update /etc/hosts with the hostname
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "127.0.0.1\tlocalhost {{ inventory_hostname }}"
+        regexp: '^127\.0\.0\.1\tlocalhost(?: {{ inventory_hostname }})?$'
