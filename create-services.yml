@@ -135,7 +135,7 @@
         name: wordpress_nginx
       tags: web
 
-- hosts: dev,gateway,prod3
+- hosts: dev,gateway,prod4
 
   tasks:
 
