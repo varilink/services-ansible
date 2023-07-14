@@ -1,3 +1,9 @@
+# The Varilink "Libraries - Ansible Playbooks" repository
+[submodule "playbooks"]
+	path = playbooks
+	url = git@github.com:varilink/libraries-ansible_playbooks.git
+
+# The Varilink "Libraries - Ansible Roles" repository
 [submodule "roles"]
 	path = roles
 	url = https://github.com/varilink/libraries-ansible
