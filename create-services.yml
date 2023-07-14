@@ -139,6 +139,15 @@
 
   tasks:
 
-    - ansible.builtin.import_role:
-        name: wordpress_apache
+    - block:
+
+        - ansible.builtin.import_role:
+            name: database
+
+        - ansible.builtin.import_role:
+            name: wordpress_apache
+
+        - ansible.builtin.import_role:
+            name: reverse_proxy
+
       tags: web
