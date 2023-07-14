@@ -102,6 +102,11 @@
       vars:
         env_uses_ca: no
 
+    - ansible.builtin.import_role:
+        name: dynamic_dns
+        tasks_from: copy-project-records
+      tags: monitor
+
 - hosts: all
 
   tasks:
